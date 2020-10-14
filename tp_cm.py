@@ -14,26 +14,25 @@ def make_measurements(csv_name,time_meas):
 	ser.write("${}\r\n".format('GO').encode())
 	ser.flushInput()
 	ser.flushOutput()
-	
 	with open(csv_name,"a", newline='') as f:
 		writer = csv.writer(f,delimiter=",")
 		writer.writerow(['date','time','HD','AZ','INC','SD'])
-	
-	
 		t_end = time.time() + time_meas
 		while time.time() < t_end:
 			reads = ser.readline()
 			decreds = reads.decode("utf-8")
-			writer.writerow([time.strftime('%d/%m/%y'),time.strftime('%H:%M:%S'),decreds[10:14],decreds[17:23],decreds[26:30],decreds[33:37]])
-			f.flush()
-			
+			if decreds == "$OK\r\n":
+				pass
+			else:
+				writer.writerow([time.strftime('%d/%m/%y'),time.strftime('%H:%M:%S'),decreds.split(',')[2],decreds.split(',')[4],decreds.split(',')[6],decreds.split(',')[8]])
+				f.flush()
 	ser.write("${}\r\n".format('ST').encode())
 	
 def main():
 		
 	while True:
 	
-		cmd= input("Command: (type '?' for help)")
+		cmd = input("Command: (type '?' for help)")
 		
 		if cmd == "p":
 			com_port=input("Port at which the TruePulse is connected:")
@@ -74,10 +73,9 @@ def main():
 			continue
 			
 		if cmd == "m":
-			try:
-				make_measurements(csv_name,time_meas)
-			except:
-				print("Time or output not defined")
+			
+			make_measurements(csv_name,time_meas)
+			
 			continue
 			
 
