@@ -52,7 +52,7 @@ def main():
 				if ser.isOpen() == True:
 					print("Connection established")
 			except NameError:
-				print("No port definied")
+				print("No port or timeout defined")
 			except:
 				print("Could not connect to TruePulse: wrong port?")
 			continue
@@ -73,9 +73,12 @@ def main():
 			continue
 			
 		if cmd == "m":
-			
-			make_measurements(csv_name,time_meas)
-			
+			try:
+				make_measurements(csv_name,time_meas)
+			except NameError:
+				print("Csv or Time not set")
+			except:
+				print("Something went wrong :'(")
 			continue
 			
 
