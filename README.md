@@ -10,6 +10,7 @@ Modules:
 - pyserial
 - time
 - csv
+- os
 
 ### Workflow
 
