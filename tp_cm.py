@@ -1,6 +1,7 @@
 import serial
 import time
 import csv
+import os
 
 
 
@@ -13,10 +14,10 @@ def connect_serial(com_port,timeout):
 def make_measurements(csv_name,time_meas):
 	ser.write("${}\r\n".format('GO').encode())
 	ser.flushInput()
-	ser.flushOutput()
+	ser.flushOutput()	
 	with open(csv_name,"a", newline='') as f:
 		writer = csv.writer(f,delimiter=",")
-		writer.writerow(['date','time','HD','AZ','INC','SD'])
+		writer.writerow(['date','time','HD','AZ','INC','SD'])	
 		t_end = time.time() + time_meas
 		while time.time() < t_end:
 			reads = ser.readline()
@@ -25,14 +26,16 @@ def make_measurements(csv_name,time_meas):
 				pass
 			else:
 				writer.writerow([time.strftime('%d/%m/%y'),time.strftime('%H:%M:%S'),decreds.split(',')[2],decreds.split(',')[4],decreds.split(',')[6],decreds.split(',')[8]])
-				f.flush()
+			f.flush()
+			print("Time left:", int(round(t_end-time.time(),0)), "seconds", end='\r')
+			
 	ser.write("${}\r\n".format('ST').encode())
 	
 def main():
 		
 	while True:
 	
-		cmd = input("Command: (type '?' for help)")
+		cmd= input("Command: (type '?' for help)")
 		
 		if cmd == "p":
 			com_port=input("Port at which the TruePulse is connected:")
@@ -52,7 +55,7 @@ def main():
 				if ser.isOpen() == True:
 					print("Connection established")
 			except NameError:
-				print("No port or timeout defined")
+				print("No port definied")
 			except:
 				print("Could not connect to TruePulse: wrong port?")
 			continue
@@ -68,21 +71,20 @@ def main():
 			continue
 			
 		if cmd == "t":
-			csv_name=input("Name of the csv file (with .csv ending):")
+			os.chdir(os.path.dirname(__file__))
+			filename=input("Name of the csv file (with .csv ending):")
+			csv_name=os.path.join(os.getcwd(),filename)
 			print("Measurement will be saved as:", csv_name)		
 			continue
 			
 		if cmd == "m":
 			try:
 				make_measurements(csv_name,time_meas)
+				print("Measurement saved at:", csv_name)
 			except NameError:
-				print("Csv or Time not set")
-			except:
-				print("Something went wrong :'(")
+				print("Time or output not defined; Device connected?")
 			continue
-			
-
-		
+				
 		if cmd == "e":
 			try:
 				ser.flushInput()
