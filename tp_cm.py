@@ -15,7 +15,7 @@ def make_measurements(csv_name,time_meas):
 	ser.write("${}\r\n".format('GO').encode())
 	ser.flushInput()
 	ser.flushOutput()	
-	with open(csv_name,"a", newline='') as f:
+	with open(csv_name,"w", newline='') as f:
 		writer = csv.writer(f,delimiter=",")
 		writer.writerow(['date','time','HD','AZ','INC','SD'])	
 		t_end = time.time() + time_meas
@@ -79,8 +79,11 @@ def main():
 			
 		if cmd == "m":
 			try:
-				make_measurements(csv_name,time_meas)
-				print("Measurement saved at:", csv_name)
+				if os.path.exists(csv_name) == True:
+					print("File already exists")
+				else:
+					make_measurements(csv_name,time_meas)
+					print("Measurement saved at:", csv_name)				
 			except NameError:
 				print("Time or output not defined; Device connected?")
 			continue
