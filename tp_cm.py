@@ -71,7 +71,6 @@ def main():
 			continue
 			
 		if cmd == "t":
-			os.chdir(os.path.dirname(__file__))
 			filename=input("Name of the csv file (with .csv ending):")
 			csv_name=os.path.join(os.getcwd(),filename)
 			print("Measurement will be saved as:", csv_name)		
